@@ -1,97 +1,115 @@
 # Anubis
 
-            d8888                   888      d8b
-           d88888                   888      Y8P
-          d88P888                   888
-         d88P 888 88888b.  888  888 88888b.  888 .d8888b
-        d88P  888 888 "88b 888  888 888 "88b 888 88K
-       d88P   888 888  888 888  888 888  888 888 "Y8888b.
-      d8888888888 888  888 Y88b 888 888 d88P 888      X88
-     d88P     888 888  888  "Y88888 88888P"  888  88888P'
+[![Build Status](https://travis-ci.org/jonluca/Anubis.svg?branch=master)](https://travis-ci.org/jonluca/Anubis) ![Coverage](https://github.com/jonluca/Anubis/blob/master/coverage.svg) [![GitHub issues](https://img.shields.io/github/issues/jonluca/Anubis.svg)](https://github.com/jonluca/Anubis/issues) [![GitHub license](https://img.shields.io/github/license/jonluca/Anubis.svg)](https://github.com/jonluca/Anubis/blob/master/LICENSE) 
+```
+        d8888                   888      d8b
+       d88888                   888      Y8P
+      d88P888                   888
+     d88P 888 88888b.  888  888 88888b.  888 .d8888b
+    d88P  888 888 "88b 888  888 888 "88b 888 88K
+   d88P   888 888  888 888  888 888  888 888 "Y8888b.
+  d8888888888 888  888 Y88b 888 888 d88P 888      X88
+ d88P     888 888  888  "Y88888 88888P"  888  88888P'
+```
 
-Welcome to Anubis, a subdomain enumerator and information gathering tool.
+Anubis is a subdomain enumeration and information gathering tool. Anubis collates data from a variety of sources, including HackerTarget, DNSDumpster, x509 certs, VirusTotal, Google, Pkey, and NetCraft. Anubis also has a sister project, [AnubisDB](https://github.com/jonluca/Anubis-DB), which serves as a centralized repository of subdomains.
 
-## Requirements
+[Original Medium article release](https://medium.com/@jonluca/introducing-anubis-a-new-subdomain-enumerator-and-information-gathering-tool-d25b39ad98f2)
 
-``pip install -r requirements``
+## Getting Started
 
-* Python 3.6
-* Nmap
+### Prerequisites
 
-## Installation
+* Nmap (if wanting to run port scans and certain certificate scans)
 
-Please note Anubis is still in beta. 
+If you are running Linux, the following are also required:
 
-`pip install -e .[test]`
+`sudo apt-get install python3-pip python-dev libssl-dev libffi-dev`
 
-Will install it as  CLI program, to `/usr/local/bin/anubis` on macos.
+### Installing
 
-### API Keys
+Note: Python 3 is required
 
-If you wish to use the `--aditional-info` flag, you'll need to set up an API key for https://shodan.io. 
+`pip3 install anubis-netsec`
 
-Copy `API_SAMPLE.py` to `APY.py`, 
+Or Linux Snap distribution:
+
+`snap install anubis`
+
+### Install From Source
+
+Please note Anubis is still in beta.
+
+```
+git clone https://github.com/jonluca/Anubis.git
+cd Anubis
+pip3 install  -r requirements.txt
+pip3 install .
+```
 
 ## Usage
 
     Usage:
-      anubis -t TARGET [-noispbdv] [-o FILENAME] [-w SCAN]
+      anubis -t TARGET [-o FILENAME] [-noispbarv] [-w SCAN] [-q NUM]
       anubis -h
       anubis --version
       
     Options:
-      -h --help                         show this help message and exit
-      -t --target                       set target
-      -n --with-nmap                    perform an nmap service/script scan
-      -o --output                       save to filename
-      -i --additional-info              show additional information about the host from Shodan (requires API key)
-      -s --ssl                          run an ssl scan and output cipher + chain info
-      -p --ip                           outputs the resolved IPs for each subdomain, and a full list of unique ips
-      -d --no-anubis-db                 don't send results to anubisdb
-      -w --overwrite-nmap-scan          overwrite default nmap scan (default -nPn -sV -sC)
-      -v --verbose                      print debug info and full request output
-      --version                         show version and exit
-      
+      -h --help                       show this help message and exit
+      -t --target                     set target (comma separated, no spaces, if multiple)
+      -n --with-nmap                  perform an nmap service/script scan
+      -o --output                     save to filename
+      -i --additional-info            show additional information about the host from Shodan (requires API key)
+      -p --ip                         outputs the resolved IPs for each subdomain, and a full list of unique ips
+      -a --send-to-anubis-db          send results to Anubis-DB
+      -r --recursive                  recursively search over all subdomains
+      -s --ssl                        run an ssl scan and output cipher + chain info
+      -w --overwrite-nmap-scan SCAN   overwrite default nmap scan (default -nPn -sV -sC)
+      -v --verbose                    print debug info and full request output
+      -q --queue-workers NUM          override number of queue workers (default: 10, max: 100)
+      --version                       show version and exit
+
     Help:
       For help using this tool, please open an issue on the Github repository:
-      https://github.com/jonluca/anubis 
-         
-## About
-
-Anubis collates data from a variety of sources, including HackerTarget, DNSDumpster, x509 certs, VirusTotal, Google, Pkey, and NetCraft.
-
-Anubis also has a sister project, [AnubisDB](https://github.com/jonluca/Anubis-DB), which serves as a centralized repository of subdomains. Subdomains are *automatically* sent to AnubisDB - to disable this functionality, pass the `d` flag when running Anubis.
- 
-## Sample Output
+      https://github.com/jonluca/anubis
 
 ### Basic
-```anubis -t reddit.com``` 
+
+#### Common Use Case
+
+`anubis -tipa  domain.com -o out.txt`
+
+Set's target to `domain.com`, (`t`) outputs additional information (`i`) like server and ISP or server hosting provider, then attempts to resolve all URLs (`p`) and outputs list of unique IPs and sends to Anubis-DB (`a`). Finally, writes all results to out.txt (`o`).
+
+#### Other
+
+```anubis -t reddit.com``` Simplest use of Anubis, just runs subdomain enumeration
 
 ```
-Searching for subdomains for 151.101.129.140
-Found 126 domains
+Searching for subdomains for 151.101.65.140 (reddit.com)
+
+Testing for zone transfers
+Searching for Subject Alt Names
+Searching HackerTarget
+Searching VirusTotal
+Searching Pkey.in
+Searching NetCraft.com
+Searching crt.sh
+Searching DNSDumpster
+Searching Anubis-DB
+Found 193 subdomains
 ----------------
-aa.reddit.com
-ss.reddit.com
-qu.reddit.com
-roosterteeth.reddit.com
-http://dg.reddit.com
-pp.reddit.com
-i.reddit.com
-http://www.reddit.com
-di.reddit.com
-bj.reddit.com
-augustames.reddit.com
-so.reddit.com
-www.reddit.com
-http://reddit.com
-http://nj.reddit.com
-space.reddit.com
-api.reddit.com
+fj.reddit.com
+se.reddit.com
+gateway.reddit.com
+beta.reddit.com
+ww.reddit.com
 ... (truncated for readability)
+Sending to AnubisDB
+Subdomain search took 0:00:20.390
 ```
 
-`anubis -t reddit.com -ip` (equivalent to `anubis -t reddit.com --additional-info --ip`)
+`anubis -t reddit.com -ip` (equivalent to `anubis -t reddit.com --additional-info --ip`) - resolves IPs and outputs list of uniques, and provides additional information through https://shodan.io
 
 ```
 Searching for subdomains for 151.101.65.140
@@ -134,10 +152,20 @@ Execution took 0:00:04.604
 ```
 
 ### Advanced
-```anubis -t reddit.com --with-nmap -o temp.txt -is --overwrite-nmap-scan "-F -T5"``` 
+```anubis -t reddit.com --with-nmap -o temp.txt -is --overwrite-nmap-scan "-F -T5"```
 
 ```
-Searching for subdomains for 151.101.129.140
+Searching for subdomains for 151.101.65.140 (reddit.com)
+
+Testing for zone transfers
+Searching for Subject Alt Names
+Searching HackerTarget
+Searching VirusTotal
+Searching Pkey.in
+Searching NetCraft.com
+Searching crt.sh
+Searching DNSDumpster
+Searching Anubis-DB
 Running SSL Scan
 Available TLSv1.0 Ciphers:
     TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
@@ -147,14 +175,14 @@ Available TLSv1.0 Ciphers:
     TLS_RSA_WITH_3DES_EDE_CBC_SHA
 Available TLSv1.2 Ciphers:
     TLS_RSA_WITH_AES_256_CBC_SHA
-    TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
     TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
     TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
-    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-    TLS_RSA_WITH_AES_128_CBC_SHA
+    TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
     TLS_RSA_WITH_AES_128_GCM_SHA256
     TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
     TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+    TLS_RSA_WITH_AES_128_CBC_SHA
     TLS_RSA_WITH_3DES_EDE_CBC_SHA
  * Certificate Information:
      Content
@@ -189,38 +217,81 @@ Available TLSv1.2 Ciphers:
        Responder Id:                      0F80611C823161D52F28E78D4638B42CE1C6D9E2
        Cert Status:                       good
        Cert Serial Number:                08CF7DA9B222C9D983C50D993F2F5437
-       This Update:                       Dec 10 16:18:57 2017 GMT
-       Next Update:                       Dec 17 15:33:57 2017 GMT
-Server Location: San Francisco US - 94107
-ISP: Fastly
+       This Update:                       Dec 16 16:20:41 2017 GMT
+       Next Update:                       Dec 23 15:35:41 2017 GMT
+ * OpenSSL Heartbleed:
+                                          OK - Not vulnerable to Heartbleed
+ * HTTP Security Headers:
+       NOT SUPPORTED - Server did not send an HSTS header
+
+     HTTP Public Key Pinning (HPKP)
+       NOT SUPPORTED - Server did not send an HPKP header
+
+     Computed HPKP Pins for Current Chain
+      0 - *.reddit.com                                  3FUu+FYb3IyHxicQEMs5sSzs207fuv25p7NGRIPDaAw=
+      1 - DigiCert SHA2 Secure Server CA                5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w=
+      2 - DigiCert Global Root CA                       r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=
+Searching Shodan.io for additional information
+Server Location: San Francisco, US - 94107
+ISP  or Hosting Company: Fastly
+To run a DNSSEC subdomain enumeration, Anubis must be run as root
 Starting Nmap Scan
-Host : 151.101.129.140 ()
+Host : 151.101.65.140 ()
 ----------
 Protocol: tcp
-port: 53	state: open
 port: 80	state: open
 port: 443	state: open
-Found 126 domains
+Found 195 subdomains
 ----------------
-nd.reddit.com
-askreddit.reddit.com
-roosterteeth.reddit.com
-qu.reddit.com
-cp.reddit.com
-mx02.reddit.com
-nh.reddit.com
+nm.reddit.com
+ne.reddit.com
+sonics.reddit.com
+aj.reddit.com
+fo.reddit.com
+f5.reddit.com
 ... (truncated for readability)
+Sending to AnubisDB
+Subdomain search took 0:00:26.579
 ```
 
-Additionally, it would write out to a file called "out.txt" in the directory in which it was called.
+## Running the tests
+
+Run all test *with coverage*
+
+```
+ python3 setup.py test
+```
+
+Run tests on their own, in native pytest environment
+
+```pytest```
 
 
-## Credits
+## Built With
 
 * CLI Boilerplate by [Skele-CLI](https://github.com/rdegges/skele-cli)
 
 * [sslyze](https://github.com/nabla-c0d3/sslyze)
 
+
+## Contributing
+
+Please read [CONTRIBUTING.md](https://github.com/jonluca/Anubis/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+
+## Authors
+
+* **JonLuca DeCaro** - *Initial work* - [Anubis](https://github.com/Anubis)
+
+See also the list of [contributors](https://github.com/jonluca/Anubis/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
 * [/r/netsec](https://reddit.com/r/netsec)
 
 * [BitQuark for the most common subdomains](https://github.com/bitquark/dnspop/tree/master/results)
+
